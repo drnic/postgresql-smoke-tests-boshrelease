@@ -29,3 +29,5 @@ networks:
 - name: smoke_tests1
   type: manual
   subnets: (( grab meta.subnets ))
+
+properties: {}

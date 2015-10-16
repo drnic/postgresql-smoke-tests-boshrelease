@@ -1,6 +1,6 @@
 ---
 meta:
-  subnets: (( merge ))
+  subnets: (( param "please provide 'subnets'" ))
 
 networks:
 - name: smoke_tests1
