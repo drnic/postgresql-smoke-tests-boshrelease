@@ -1,0 +1,26 @@
+meta:
+  persistent_disk: 40960
+
+  stemcell:
+    name: bosh-aws-xen-ubuntu-trusty-go_agent
+    version: latest
+
+jobs:
+  - name: smoke_tests
+    networks:
+      - name: smoke_tests1
+    persistent_disk: (( grab meta.persistent_disk ))
+
+compilation:
+  cloud_properties:
+    instance_type: m1.small
+
+resource_pools:
+  - name: small_z1
+    cloud_properties:
+      instance_type: m1.small
+
+networks:
+- name: smoke_tests1
+  type: manual
+  subnets: (( merge ))
