@@ -1,11 +1,9 @@
 #!/bin/bash
 
 infrastructure=$1; shift
-runner=$1; shift
-docker_image=$1; shift
 set -e
 
-template_prefix="postgresql-docker"
+template_prefix="postgresql-smoke-tests"
 STEMCELL_OS=${STEMCELL_OS:-ubuntu}
 
 if [[ "$(which spruce)X" == "X" ]]; then
@@ -15,19 +13,12 @@ if [[ "$(which spruce)X" == "X" ]]; then
 fi
 
 usage() {
-  echo "usage: ./make_manifest <aws|garden|warden> <container|broker> <embedded|upstream>"
+  echo "usage: ./make_manifest <aws|warden>"
   exit 1
 }
 
 if [ "$infrastructure" != "aws" ] && \
-    [ "$infrastructure" != "garden" ] && \
     [ "$infrastructure" != "warden" ] ; then
-  usage
-fi
-if [ "$runner" != "container" ] && [ "$runner" != "broker" ] ; then
-  usage
-fi
-if [ "$docker_image" != "embedded" ] && [ "$docker_image" != "upstream" ] ; then
   usage
 fi
 
@@ -36,7 +27,7 @@ if [[ "${DEMO}X" == "X" ]]; then
   DIRECTOR_UUID=$(echo "$BOSH_STATUS" | grep UUID | awk '{print $2}')
   DIRECTOR_CPI=$(echo "$BOSH_STATUS" | grep CPI | awk '{print $2}')
   DIRECTOR_NAME=$(echo "$BOSH_STATUS" | grep Name | awk '{print $2}')
-  NAME=$template_prefix-$infrastructure-$runner-$docker_image
+  NAME=$template_prefix-$infrastructure
 else
   DIRECTOR_UUID=xxxxxxx-6076-11e5-8e69-6c4008a663f0
   DIRECTOR_CPI=aws
@@ -86,7 +77,6 @@ perl -pi -e "s/STEMCELL/$STEMCELL/g" $tmpdir/pipeline-inputs.yml
 spruce merge --prune meta \
   $templates/deployment.yml \
   $templates/jobs.yml \
-  $templates/run-${runner}-image-${docker_image}.yml \
   $templates/infrastructure-${infrastructure}.yml \
   $templates/env-${infrastructure}-networking.yml \
   $tmpdir/director.yml \
